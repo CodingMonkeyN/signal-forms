@@ -24,7 +24,8 @@
       },
       "configurations": {
         "production": {
-          "baseHref": "/app/",
+          "baseHref": "/signal-forms/",
+          "deployUrl": "/signal-forms/",
           "budgets": [
             {
               "type": "initial",
