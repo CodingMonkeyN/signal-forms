@@ -1,0 +1,398 @@
+<div class="max-w-6xl mx-auto px-6 py-8">
+  <h1 class="text-4xl font-bold text-gray-800 mb-2">Error Display Patterns</h1>
+  <p class="text-lg text-gray-600 mb-8">
+    Various approaches for showing validation errors: inline, summary, global
+    error bar, and server errors via <code>submit()</code>.
+  </p>
+
+  <div class="grid grid-cols-1 xl:grid-cols-5 gap-8">
+    <div class="xl:col-span-3">
+      <!-- Global Error Summary -->
+      @if (showGlobalErrors() && contactForm().invalid()) {
+        <div class="bg-red-50 border border-red-300 rounded-lg p-4 mb-6">
+          <div class="flex items-start gap-3">
+            <svg
+              class="w-6 h-6 text-red-600 shrink-0 mt-0.5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"
+              />
+            </svg>
+            <div>
+              <h3 class="text-red-800 font-bold mb-2">
+                Please fix the following errors:
+              </h3>
+              <ul class="space-y-1">
+                @for (error of contactForm().errorSummary(); track $index) {
+                  <li class="text-red-700 text-sm flex items-start gap-2">
+                    <span class="text-red-400 mt-1">•</span>
+                    <span>{{ error.message || error.kind }}</span>
+                  </li>
+                }
+              </ul>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- Server Error -->
+      @if (serverError) {
+        <div class="bg-orange-50 border border-orange-300 rounded-lg p-4 mb-6">
+          <div class="flex items-center gap-3">
+            <svg
+              class="w-6 h-6 text-orange-600 shrink-0"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            <span class="text-orange-800 font-medium">{{ serverError }}</span>
+          </div>
+        </div>
+      }
+
+      <!-- Success -->
+      @if (submitSuccess) {
+        <div class="bg-green-50 border border-green-300 rounded-lg p-4 mb-6">
+          <div class="flex items-center gap-3">
+            <svg
+              class="w-6 h-6 text-green-600 shrink-0"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M5 13l4 4L19 7"
+              />
+            </svg>
+            <span class="text-green-800 font-medium"
+              >Form submitted successfully!</span
+            >
+          </div>
+        </div>
+      }
+
+      <!-- Form -->
+      <div class="bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-2xl font-semibold mb-6">Contact Form</h2>
+
+        <div class="space-y-5">
+          <!-- Name with inline errors -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1"
+              >Full Name</label
+            >
+            <input
+              type="text"
+              [formField]="contactForm.name"
+              class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none transition"
+              [class.border-red-500]="
+                contactForm.name().touched() && contactForm.name().invalid()
+              "
+              [class.border-green-500]="
+                contactForm.name().touched() && contactForm.name().valid()
+              "
+              placeholder="John Doe"
+            />
+            <!-- Style 1: Inline error messages -->
+            @if (contactForm.name().touched() && contactForm.name().invalid()) {
+              <div class="mt-1 space-y-1">
+                @for (error of contactForm.name().errors(); track error.kind) {
+                  <p class="text-red-600 text-sm flex items-center gap-1">
+                    <svg
+                      class="w-4 h-4 shrink-0"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fill-rule="evenodd"
+                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                        clip-rule="evenodd"
+                      />
+                    </svg>
+                    {{ error.message }}
+                  </p>
+                }
+              </div>
+            }
+            @if (contactForm.name().touched() && contactForm.name().valid()) {
+              <p class="text-green-600 text-sm mt-1 flex items-center gap-1">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path
+                    fill-rule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+                Looks good!
+              </p>
+            }
+          </div>
+
+          <!-- Email with tooltip-style errors -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1"
+              >Email</label
+            >
+            <div class="relative">
+              <input
+                type="email"
+                [formField]="contactForm.email"
+                class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none transition pr-10"
+                [class.border-red-500]="
+                  contactForm.email().touched() && contactForm.email().invalid()
+                "
+                [class.border-green-500]="
+                  contactForm.email().touched() && contactForm.email().valid()
+                "
+                placeholder="you&#64;example.com"
+              />
+              <!-- Status icon inside input -->
+              @if (contactForm.email().touched()) {
+                <div class="absolute right-3 top-1/2 -translate-y-1/2">
+                  @if (contactForm.email().valid()) {
+                    <svg
+                      class="w-5 h-5 text-green-500"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fill-rule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                        clip-rule="evenodd"
+                      />
+                    </svg>
+                  } @else {
+                    <svg
+                      class="w-5 h-5 text-red-500"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fill-rule="evenodd"
+                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                        clip-rule="evenodd"
+                      />
+                    </svg>
+                  }
+                </div>
+              }
+            </div>
+            @if (
+              contactForm.email().touched() && contactForm.email().invalid()
+            ) {
+              @for (error of contactForm.email().errors(); track error.kind) {
+                <p class="text-red-600 text-sm mt-1">{{ error.message }}</p>
+              }
+            }
+          </div>
+
+          <!-- Phone with badge-style errors -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1"
+              >Phone</label
+            >
+            <input
+              type="tel"
+              [formField]="contactForm.phone"
+              class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none transition"
+              [class.border-red-500]="
+                contactForm.phone().touched() && contactForm.phone().invalid()
+              "
+              placeholder="+49 170 1234567"
+            />
+            <!-- Style 3: Badge-style errors -->
+            @if (
+              contactForm.phone().touched() && contactForm.phone().invalid()
+            ) {
+              <div class="flex flex-wrap gap-1 mt-2">
+                @for (error of contactForm.phone().errors(); track error.kind) {
+                  <span
+                    class="bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full"
+                  >
+                    {{ error.message }}
+                  </span>
+                }
+              </div>
+            }
+          </div>
+
+          <!-- Message with character count -->
+          <div>
+            <div class="flex justify-between items-center mb-1">
+              <label class="text-sm font-medium text-gray-700">Message</label>
+              <span
+                class="text-xs"
+                [class.text-gray-400]="
+                  contactForm.message().value().length <= 400
+                "
+                [class.text-orange-600]="
+                  contactForm.message().value().length > 400 &&
+                  contactForm.message().value().length <= 500
+                "
+                [class.text-red-600]="
+                  contactForm.message().value().length > 500
+                "
+              >
+                {{ contactForm.message().value().length }}/500
+              </span>
+            </div>
+            <textarea
+              [formField]="contactForm.message"
+              rows="4"
+              class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none transition resize-none"
+              [class.border-red-500]="
+                contactForm.message().touched() &&
+                contactForm.message().invalid()
+              "
+              placeholder="How can we help?"
+            ></textarea>
+            @if (
+              contactForm.message().touched() && contactForm.message().invalid()
+            ) {
+              @for (error of contactForm.message().errors(); track error.kind) {
+                <p class="text-red-600 text-sm mt-1">{{ error.message }}</p>
+              }
+            }
+          </div>
+
+          <!-- Age with progress-bar validation -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1"
+              >Age</label
+            >
+            <input
+              type="number"
+              [formField]="contactForm.age"
+              class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none transition"
+              [class.border-red-500]="
+                contactForm.age().touched() && contactForm.age().invalid()
+              "
+              placeholder="18"
+            />
+            @if (contactForm.age().touched() && contactForm.age().invalid()) {
+              @for (error of contactForm.age().errors(); track error.kind) {
+                <p class="text-red-600 text-sm mt-1">{{ error.message }}</p>
+              }
+            }
+          </div>
+
+          <div class="flex gap-3">
+            <button
+              class="flex-1 bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700 transition disabled:opacity-50"
+              [disabled]="contactForm().submitting()"
+              (click)="onSubmit()"
+            >
+              {{ contactForm().submitting() ? 'Submitting...' : 'Submit' }}
+            </button>
+            <button
+              type="button"
+              class="px-6 py-3 border border-gray-300 rounded-lg font-semibold text-gray-700 hover:bg-gray-50 transition"
+              (click)="onReset()"
+            >
+              Reset
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Panel -->
+    <div class="xl:col-span-2 space-y-4">
+      <div class="bg-gray-900 text-green-400 rounded-lg p-6 font-mono text-sm">
+        <h3 class="text-white font-bold mb-4 font-sans text-lg">
+          errorSummary()
+        </h3>
+        <span class="text-gray-400"
+          >// ALL errors from the form and children</span
+        ><br />
+        <span class="text-yellow-300">errorSummary</span> =
+        @for (err of contactForm().errorSummary(); track $index) {
+          <br />&nbsp;&nbsp;{{ err.kind }}: "{{ err.message }}"
+        }
+        @if (contactForm().errorSummary().length === 0) {
+          <span class="text-green-300"> []</span>
+        }
+      </div>
+
+      <div class="bg-gray-900 text-green-400 rounded-lg p-6 font-mono text-sm">
+        <h3 class="text-white font-bold mb-4 font-sans text-lg">
+          Field States
+        </h3>
+        @for (field of fieldNames; track field) {
+          <div class="mb-1">
+            <span class="text-yellow-300">{{ field }}.errors</span> =
+            {{ getFieldErrors(field) | json }}
+          </div>
+        }
+      </div>
+
+      <div
+        class="bg-gray-900 text-gray-100 rounded-lg p-6 font-mono text-xs overflow-x-auto"
+      >
+        <h3 class="text-white font-bold mb-3 font-sans text-lg">
+          submit() with Server Errors
+        </h3>
+        <pre
+          class="whitespace-pre-wrap"
+        ><span class="text-purple-400">async</span> onSubmit() {{ '{' }}
+          <span class="text-purple-400">await</span> <span class="text-yellow-300">submit</span>(this.form, <span class="text-purple-400">async</span> (f) => {{ '{' }}
+          <span class="text-purple-400">const</span> res = <span class="text-purple-400">await</span> api.save(f().value());
+
+    <span class="text-gray-400">// Return errors targeted at specific fields</span>
+    <span class="text-purple-400">if</span> (res.emailTaken) {{ '{' }}
+          <span class="text-purple-400">return</span> [{{ '{' }}
+          fieldTree: this.form.email,
+        kind: <span class="text-green-400">'server'</span>,
+        message: <span class="text-green-400">'Email already taken'</span>
+          {{ '}' }}];
+          {{ '}' }}
+          <span class="text-purple-400">return</span> <span class="text-yellow-300">undefined</span>;
+          {{ '}' }});
+          {{ '}' }}
+
+          <span class="text-gray-400">// submit() automatically:</span>
+<span class="text-gray-400">// 1. Marks all fields touched</span>
+<span class="text-gray-400">// 2. Validates - aborts if invalid</span>
+<span class="text-gray-400">// 3. Sets submitting() = true</span>
+<span class="text-gray-400">// 4. Runs your async action</span>
+<span class="text-gray-400">// 5. Applies returned server errors</span>
+<span class="text-gray-400">// 6. Sets submitting() = false</span></pre>
+      </div>
+
+      <div class="bg-blue-50 border border-blue-200 rounded-lg p-6">
+        <h3 class="text-lg font-semibold text-blue-800 mb-3">Key Takeaways</h3>
+        <ul class="space-y-2 text-blue-900 text-sm">
+          <li><strong>errors()</strong> - only this field's errors</li>
+          <li>
+            <strong>errorSummary()</strong> - this field + ALL descendants
+          </li>
+          <li>
+            <strong>submit()</strong> handles the full submission lifecycle
+          </li>
+          <li>Return errors from submit() to target specific fields</li>
+          <li>
+            <strong>reset()</strong> clears touched/dirty without changing
+            values
+          </li>
+          <li>Combine touched() + invalid() for UX-friendly error display</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

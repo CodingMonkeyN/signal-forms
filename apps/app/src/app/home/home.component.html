@@ -1,0 +1,226 @@
+<div class="max-w-7xl mx-auto px-6 py-12">
+  <h1 class="text-5xl font-bold text-red-600 text-center mb-2">
+    Angular 21 Signal Forms
+  </h1>
+  <p class="text-2xl text-gray-600 text-center mb-12">
+    Complete Guide & Interactive Demos
+  </p>
+
+  <div class="bg-gray-100 rounded-lg p-8 mb-12">
+    <h2 class="text-3xl font-semibold text-gray-800 mb-4">
+      What are Signal Forms?
+    </h2>
+    <p class="text-lg text-gray-700 leading-relaxed">
+      Signal Forms represent a ground-up redesign of Angular's form system using
+      signals. Rather than treating forms and data as separate entities, they
+      unify them through a
+      <strong>form model</strong>&mdash;a writable signal that serves as the
+      single source of truth.
+    </p>
+  </div>
+
+  <!-- Basics -->
+  <div class="mb-12">
+    <h2
+      class="text-2xl font-semibold text-gray-800 mb-6 flex items-center gap-2"
+    >
+      <span
+        class="bg-red-100 text-red-700 text-xs font-bold px-2 py-1 rounded uppercase"
+        >Basics</span
+      >
+      Getting Started
+    </h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div
+        class="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-200 hover:-translate-y-1"
+      >
+        <h3 class="text-xl font-semibold text-red-600 mb-3">🎯 Basic Form</h3>
+        <p class="text-gray-600 mb-4">
+          signal() + form() + [formField] - the fundamentals
+        </p>
+        <a
+          routerLink="/basic"
+          class="text-red-600 font-semibold hover:underline"
+          >View Demo &rarr;</a
+        >
+      </div>
+
+      <div
+        class="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-200 hover:-translate-y-1"
+      >
+        <h3 class="text-xl font-semibold text-red-600 mb-3">✅ Validation</h3>
+        <p class="text-gray-600 mb-4">
+          Custom validators, cross-field validation, submit()
+        </p>
+        <a
+          routerLink="/registration"
+          class="text-red-600 font-semibold hover:underline"
+          >View Demo &rarr;</a
+        >
+      </div>
+
+      <div
+        class="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-200 hover:-translate-y-1"
+      >
+        <h3 class="text-xl font-semibold text-red-600 mb-3">
+          📋 Reusable Schemas
+        </h3>
+        <p class="text-gray-600 mb-4">
+          schema() + apply() - define once, use everywhere
+        </p>
+        <a
+          routerLink="/address"
+          class="text-red-600 font-semibold hover:underline"
+          >View Demo &rarr;</a
+        >
+      </div>
+
+      <div
+        class="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-200 hover:-translate-y-1"
+      >
+        <h3 class="text-xl font-semibold text-red-600 mb-3">
+          🎛️ Conditional Fields
+        </h3>
+        <p class="text-gray-600 mb-4">
+          hidden(), disabled(), readonly(), debounce()
+        </p>
+        <a
+          routerLink="/conditional"
+          class="text-red-600 font-semibold hover:underline"
+          >View Demo &rarr;</a
+        >
+      </div>
+    </div>
+  </div>
+
+  <!-- Advanced -->
+  <div class="mb-12">
+    <h2
+      class="text-2xl font-semibold text-gray-800 mb-6 flex items-center gap-2"
+    >
+      <span
+        class="bg-purple-100 text-purple-700 text-xs font-bold px-2 py-1 rounded uppercase"
+        >Advanced</span
+      >
+      Complex Patterns
+    </h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div
+        class="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-200 hover:-translate-y-1 border-l-4 border-purple-500"
+      >
+        <h3 class="text-xl font-semibold text-purple-600 mb-3">
+          🔧 Custom Controls
+        </h3>
+        <p class="text-gray-600 mb-4">
+          FormValueControl, FormCheckboxControl - no more CVA boilerplate
+        </p>
+        <a
+          routerLink="/custom-controls"
+          class="text-purple-600 font-semibold hover:underline"
+          >View Demo &rarr;</a
+        >
+      </div>
+
+      <div
+        class="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-200 hover:-translate-y-1 border-l-4 border-purple-500"
+      >
+        <h3 class="text-xl font-semibold text-purple-600 mb-3">
+          📦 Form Arrays
+        </h3>
+        <p class="text-gray-600 mb-4">
+          Dynamic arrays with applyEach() - add, remove, validate per row
+        </p>
+        <a
+          routerLink="/form-arrays"
+          class="text-purple-600 font-semibold hover:underline"
+          >View Demo &rarr;</a
+        >
+      </div>
+
+      <div
+        class="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-200 hover:-translate-y-1 border-l-4 border-purple-500"
+      >
+        <h3 class="text-xl font-semibold text-purple-600 mb-3">
+          🚨 Error Handling
+        </h3>
+        <p class="text-gray-600 mb-4">
+          errorSummary(), server errors, submit() lifecycle, reset()
+        </p>
+        <a
+          routerLink="/errors"
+          class="text-purple-600 font-semibold hover:underline"
+          >View Demo &rarr;</a
+        >
+      </div>
+
+      <div
+        class="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-200 hover:-translate-y-1 border-l-4 border-purple-500"
+      >
+        <h3 class="text-xl font-semibold text-purple-600 mb-3">
+          🔀 Dynamic Schemas
+        </h3>
+        <p class="text-gray-600 mb-4">
+          applyWhen() - swap entire validation schemas at runtime
+        </p>
+        <a
+          routerLink="/dynamic"
+          class="text-purple-600 font-semibold hover:underline"
+          >View Demo &rarr;</a
+        >
+      </div>
+
+      <div
+        class="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-200 hover:-translate-y-1 border-l-4 border-blue-500"
+      >
+        <h3 class="text-xl font-semibold text-blue-600 mb-3">⚖️ Comparison</h3>
+        <p class="text-gray-600 mb-4">
+          Reactive Forms vs Signal Forms side-by-side
+        </p>
+        <a
+          routerLink="/comparison"
+          class="text-blue-600 font-semibold hover:underline"
+          >View Demo &rarr;</a
+        >
+      </div>
+
+      <div
+        class="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-200 hover:-translate-y-1 border-l-4 border-orange-500"
+      >
+        <h3 class="text-xl font-semibold text-orange-600 mb-3">🔄 Migration</h3>
+        <p class="text-gray-600 mb-4">
+          compatForm() - migrate from Reactive Forms step by step
+        </p>
+        <a
+          routerLink="/migration"
+          class="text-orange-600 font-semibold hover:underline"
+          >View Demo &rarr;</a
+        >
+      </div>
+    </div>
+  </div>
+
+  <div
+    class="bg-gradient-to-br from-purple-600 to-purple-800 text-white rounded-lg p-8"
+  >
+    <h2 class="text-3xl font-semibold mb-6">Why Signal Forms?</h2>
+    <ul class="space-y-3 text-lg">
+      <li>
+        ✨ <strong>Complete Type Safety</strong> - No compromises, no casting
+      </li>
+      <li>
+        🚀 <strong>Automatic Reactivity</strong> - Zero manual subscriptions
+      </li>
+      <li>🎨 <strong>Simpler API</strong> - One directive instead of four</li>
+      <li>
+        🔧 <strong>Custom Controls</strong> - Just one model signal required
+      </li>
+      <li>
+        📦 <strong>Bidirectional Sync</strong> - Form and data stay in sync
+      </li>
+      <li>
+        🔌 <strong>Gradual Migration</strong> - Works with existing Reactive
+        Forms
+      </li>
+    </ul>
+  </div>
+</div>

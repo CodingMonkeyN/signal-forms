@@ -1,0 +1,276 @@
+<div class="max-w-5xl mx-auto px-6 py-8">
+  <h1 class="text-4xl font-bold text-gray-800 mb-2">Conditional Fields</h1>
+  <p class="text-lg text-gray-600 mb-8">
+    Dynamic field state with <code>disabled()</code>, <code>hidden()</code>,
+    <code>readonly()</code> and <code>debounce()</code> - all reactive, no
+    subscriptions.
+  </p>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <!-- Form -->
+    <div class="bg-white rounded-lg shadow-md p-6">
+      <h2 class="text-2xl font-semibold mb-6">Order Configuration</h2>
+
+      <div class="space-y-5">
+        <!-- Customer Type -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1"
+            >Customer Type</label
+          >
+          <select
+            [formField]="configForm.customerType"
+            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none transition"
+          >
+            <option value="personal">Personal</option>
+            <option value="business">Business</option>
+          </select>
+        </div>
+
+        <!-- Company Name (hidden unless business) -->
+        @if (!configForm.companyName().hidden()) {
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              Company Name
+              <span class="text-xs text-purple-600 ml-1"
+                >(shown when business)</span
+              >
+            </label>
+            <input
+              type="text"
+              [formField]="configForm.companyName"
+              class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none transition"
+              placeholder="Acme Corp"
+            />
+            @if (
+              configForm.companyName().touched() &&
+              configForm.companyName().invalid()
+            ) {
+              @for (
+                error of configForm.companyName().errors();
+                track error.kind
+              ) {
+                <p class="text-red-600 text-sm mt-1">{{ error.message }}</p>
+              }
+            }
+          </div>
+        }
+
+        <!-- VAT Number (hidden unless business) -->
+        @if (!configForm.vatNumber().hidden()) {
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              VAT Number
+              <span class="text-xs text-purple-600 ml-1"
+                >(shown when business)</span
+              >
+            </label>
+            <input
+              type="text"
+              [formField]="configForm.vatNumber"
+              class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none transition"
+              placeholder="DE123456789"
+            />
+          </div>
+        }
+
+        <!-- Payment Method -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1"
+            >Payment Method</label
+          >
+          <select
+            [formField]="configForm.paymentMethod"
+            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none transition"
+          >
+            <option value="card">Credit Card</option>
+            <option value="invoice">Invoice</option>
+            <option value="paypal">PayPal</option>
+          </select>
+        </div>
+
+        <!-- Card Number (hidden unless card) -->
+        @if (!configForm.cardNumber().hidden()) {
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              Card Number
+              <span class="text-xs text-purple-600 ml-1"
+                >(shown when card selected)</span
+              >
+            </label>
+            <input
+              type="text"
+              [formField]="configForm.cardNumber"
+              class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none transition"
+              placeholder="4242 4242 4242 4242"
+            />
+            @if (
+              configForm.cardNumber().touched() &&
+              configForm.cardNumber().invalid()
+            ) {
+              @for (
+                error of configForm.cardNumber().errors();
+                track error.kind
+              ) {
+                <p class="text-red-600 text-sm mt-1">{{ error.message }}</p>
+              }
+            }
+          </div>
+        }
+
+        <!-- Invoice Reference (hidden unless invoice) -->
+        @if (!configForm.invoiceReference().hidden()) {
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              Invoice Reference
+              <span class="text-xs text-purple-600 ml-1"
+                >(shown when invoice selected)</span
+              >
+            </label>
+            <input
+              type="text"
+              [formField]="configForm.invoiceReference"
+              class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none transition"
+              placeholder="INV-2025-001"
+            />
+          </div>
+        }
+
+        <!-- Quantity -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1"
+            >Quantity</label
+          >
+          <input
+            type="number"
+            [formField]="configForm.quantity"
+            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none transition"
+          />
+          @if (
+            configForm.quantity().touched() && configForm.quantity().invalid()
+          ) {
+            @for (error of configForm.quantity().errors(); track error.kind) {
+              <p class="text-red-600 text-sm mt-1">{{ error.message }}</p>
+            }
+          }
+        </div>
+
+        <!-- Discount Code (disabled for business) -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            Discount Code
+            @if (configForm.discountCode().disabled()) {
+              <span class="text-xs text-orange-600 ml-1"
+                >(disabled for business customers)</span
+              >
+            }
+          </label>
+          <input
+            type="text"
+            [formField]="configForm.discountCode"
+            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none transition disabled:bg-gray-100 disabled:text-gray-400"
+            placeholder="SAVE20"
+          />
+        </div>
+
+        <!-- Notes (debounced) -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            Notes <span class="text-xs text-gray-400">(debounced 500ms)</span>
+          </label>
+          <textarea
+            [formField]="configForm.notes"
+            rows="2"
+            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none transition resize-none"
+            placeholder="Special delivery instructions..."
+          ></textarea>
+        </div>
+
+        <button
+          class="w-full bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700 transition disabled:opacity-50"
+          [disabled]="configForm().invalid()"
+        >
+          Submit Order
+        </button>
+      </div>
+    </div>
+
+    <!-- Right Panel -->
+    <div class="space-y-4">
+      <div class="bg-gray-900 text-green-400 rounded-lg p-6 font-mono text-sm">
+        <h3 class="text-white font-bold mb-4 font-sans text-lg">
+          Live Conditional State
+        </h3>
+
+        <div class="mb-3">
+          <span class="text-gray-400">// Customer type drives visibility</span
+          ><br />
+          <span class="text-yellow-300">customerType</span> = "{{
+            configModel().customerType
+          }}"<br />
+          <span class="text-yellow-300">companyName.hidden</span> =
+          {{ configForm.companyName().hidden() }}<br />
+          <span class="text-yellow-300">vatNumber.hidden</span> =
+          {{ configForm.vatNumber().hidden() }}<br />
+          <span class="text-yellow-300">discountCode.disabled</span> =
+          {{ configForm.discountCode().disabled() }}
+        </div>
+
+        <div class="mb-3">
+          <span class="text-gray-400">// Payment method drives visibility</span
+          ><br />
+          <span class="text-yellow-300">paymentMethod</span> = "{{
+            configModel().paymentMethod
+          }}"<br />
+          <span class="text-yellow-300">cardNumber.hidden</span> =
+          {{ configForm.cardNumber().hidden() }}<br />
+          <span class="text-yellow-300">invoiceRef.hidden</span> =
+          {{ configForm.invoiceReference().hidden() }}
+        </div>
+
+        <div>
+          <span class="text-gray-400">// Model</span><br />
+          <span class="text-yellow-300">model</span> =
+          {{ configModel() | json }}
+        </div>
+      </div>
+
+      <div class="bg-blue-50 border border-blue-200 rounded-lg p-6">
+        <h3 class="text-lg font-semibold text-blue-800 mb-3">Key Takeaways</h3>
+        <ul class="space-y-2 text-blue-900 text-sm">
+          <li>
+            <strong>hidden()</strong> - conditionally hide fields based on other
+            values
+          </li>
+          <li><strong>disabled()</strong> - conditionally disable fields</li>
+          <li><strong>readonly()</strong> - make fields read-only</li>
+          <li><strong>debounce()</strong> - delay model updates</li>
+          <li>Hidden fields don't affect parent validity</li>
+          <li>Disabled fields don't count toward dirty state</li>
+          <li>All conditions are reactive - no manual subscriptions needed</li>
+        </ul>
+      </div>
+
+      <div
+        class="bg-gray-900 text-gray-100 rounded-lg p-6 font-mono text-sm overflow-x-auto"
+      >
+        <h3 class="text-white font-bold mb-3 font-sans text-lg">
+          Conditional Functions
+        </h3>
+        <pre
+          class="whitespace-pre-wrap"
+        ><span class="text-gray-400">// Hidden when not business</span>
+<span class="text-yellow-300">hidden</span>(order.companyName, ({{ '{' }} valueOf {{ '}' }}) =>
+  valueOf(order.customerType) !== <span class="text-green-400">'business'</span>
+);
+
+<span class="text-gray-400">// Disabled for business customers</span>
+<span class="text-yellow-300">disabled</span>(order.discountCode, ({{ '{' }} valueOf {{ '}' }}) =>
+  valueOf(order.customerType) === <span class="text-green-400">'business'</span>
+);
+
+<span class="text-gray-400">// Delay model updates by 500ms</span>
+<span class="text-yellow-300">debounce</span>(order.notes, 500);</pre>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,324 @@
+<div class="max-w-7xl mx-auto px-6 py-8">
+  <h1 class="text-4xl font-bold text-gray-800 mb-2">Side-by-Side Comparison</h1>
+  <p class="text-lg text-gray-600 mb-8">
+    Reactive Forms vs Signal Forms - same form, different approach.
+  </p>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <!-- Reactive Forms -->
+    <div>
+      <div class="bg-blue-600 text-white rounded-t-lg px-6 py-3">
+        <h2 class="text-xl font-bold">Reactive Forms (current)</h2>
+      </div>
+      <div class="bg-white rounded-b-lg shadow-md p-6">
+        <form [formGroup]="reactiveForm" class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1"
+              >Email</label
+            >
+            <input
+              type="email"
+              formControlName="email"
+              class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition"
+              placeholder="you&#64;example.com"
+            />
+            @if (
+              reactiveForm.get('email')?.touched &&
+              reactiveForm.get('email')?.invalid
+            ) {
+              <p class="text-red-600 text-sm mt-1">
+                {{
+                  reactiveForm.get('email')?.hasError('required')
+                    ? 'Email is required'
+                    : reactiveForm.get('email')?.hasError('email')
+                      ? 'Invalid email'
+                      : ''
+                }}
+              </p>
+            }
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1"
+              >Password</label
+            >
+            <input
+              type="password"
+              formControlName="password"
+              class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition"
+              placeholder="At least 8 characters"
+            />
+            @if (
+              reactiveForm.get('password')?.touched &&
+              reactiveForm.get('password')?.invalid
+            ) {
+              <p class="text-red-600 text-sm mt-1">
+                {{
+                  reactiveForm.get('password')?.hasError('required')
+                    ? 'Password is required'
+                    : reactiveForm.get('password')?.hasError('minlength')
+                      ? 'Min 8 characters'
+                      : ''
+                }}
+              </p>
+            }
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1"
+              >Confirm Password</label
+            >
+            <input
+              type="password"
+              formControlName="confirmPassword"
+              class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition"
+            />
+            @if (
+              reactiveForm.get('confirmPassword')?.touched &&
+              reactiveForm.errors?.['passwordMismatch']
+            ) {
+              <p class="text-red-600 text-sm mt-1">Passwords do not match</p>
+            }
+          </div>
+
+          <button
+            class="w-full bg-blue-600 text-white py-2 rounded-lg font-semibold hover:bg-blue-700 transition disabled:opacity-50"
+            [disabled]="reactiveForm.invalid"
+          >
+            Submit (Reactive)
+          </button>
+        </form>
+
+        <!-- Reactive Forms Code -->
+        <div
+          class="mt-6 bg-gray-900 text-gray-100 rounded-lg p-4 font-mono text-xs overflow-x-auto"
+        >
+          <h4 class="text-white font-bold mb-2 font-sans text-sm">
+            TypeScript
+          </h4>
+          <pre
+            class="whitespace-pre-wrap"
+          ><span class="text-gray-400">// FormGroup + FormControl + Validators</span>
+reactiveForm = <span class="text-purple-400">new</span> <span class="text-yellow-300">FormGroup</span>({{ '{' }}
+            email: <span class="text-purple-400">new</span> FormControl(<span class="text-green-400">''</span>, [
+    Validators.required,
+    Validators.email
+  ]),
+  password: <span class="text-purple-400">new</span> FormControl(<span class="text-green-400">''</span>, [
+    Validators.required,
+    Validators.minLength(8)
+  ]),
+  confirmPassword: <span class="text-purple-400">new</span> FormControl(<span class="text-green-400">''</span>,
+    Validators.required
+  ),
+            {{ '}' }}, {{ '{' }}
+            <span class="text-gray-400">// Cross-field validator must be a separate fn</span>
+  validators: passwordMatchValidator
+            {{ '}' }});
+
+<span class="text-gray-400">// Template: multiple directives needed</span>
+&lt;form [formGroup]="reactiveForm"&gt;
+  &lt;input formControlName="email"&gt;
+  &lt;input formControlName="password"&gt;
+&lt;/form&gt;
+
+<span class="text-gray-400">// Error checking: string-based, no type safety</span>
+reactiveForm.get(<span class="text-green-400">'email'</span>)?.hasError(<span class="text-green-400">'required'</span>)
+<span class="text-gray-400">// Returns: AbstractControl | null (not typed!)</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- Signal Forms -->
+    <div>
+      <div class="bg-red-600 text-white rounded-t-lg px-6 py-3">
+        <h2 class="text-xl font-bold">Signal Forms (new!)</h2>
+      </div>
+      <div class="bg-white rounded-b-lg shadow-md p-6">
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1"
+              >Email</label
+            >
+            <input
+              type="email"
+              [formField]="signalForm.email"
+              class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none transition"
+              placeholder="you&#64;example.com"
+            />
+            @if (signalForm.email().touched() && signalForm.email().invalid()) {
+              @for (error of signalForm.email().errors(); track error.kind) {
+                <p class="text-red-600 text-sm mt-1">{{ error.message }}</p>
+              }
+            }
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1"
+              >Password</label
+            >
+            <input
+              type="password"
+              [formField]="signalForm.password"
+              class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none transition"
+              placeholder="At least 8 characters"
+            />
+            @if (
+              signalForm.password().touched() && signalForm.password().invalid()
+            ) {
+              @for (error of signalForm.password().errors(); track error.kind) {
+                <p class="text-red-600 text-sm mt-1">{{ error.message }}</p>
+              }
+            }
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1"
+              >Confirm Password</label
+            >
+            <input
+              type="password"
+              [formField]="signalForm.confirmPassword"
+              class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none transition"
+            />
+            @if (
+              signalForm.confirmPassword().touched() &&
+              signalForm.confirmPassword().invalid()
+            ) {
+              @for (
+                error of signalForm.confirmPassword().errors();
+                track error.kind
+              ) {
+                <p class="text-red-600 text-sm mt-1">{{ error.message }}</p>
+              }
+            }
+          </div>
+
+          <button
+            class="w-full bg-red-600 text-white py-2 rounded-lg font-semibold hover:bg-red-700 transition disabled:opacity-50"
+            [disabled]="signalForm().invalid()"
+          >
+            Submit (Signal)
+          </button>
+        </div>
+
+        <!-- Signal Forms Code -->
+        <div
+          class="mt-6 bg-gray-900 text-gray-100 rounded-lg p-4 font-mono text-xs overflow-x-auto"
+        >
+          <h4 class="text-white font-bold mb-2 font-sans text-sm">
+            TypeScript
+          </h4>
+          <pre
+            class="whitespace-pre-wrap"
+          ><span class="text-gray-400">// signal() + form() - that's it!</span>
+model = <span class="text-yellow-300">signal</span>({{ '{' }}
+            email: <span class="text-green-400">''</span>, password: <span class="text-green-400">''</span>, confirmPassword: <span class="text-green-400">''</span>
+            {{ '}' }});
+
+signalForm = <span class="text-yellow-300">form</span>(this.model, (f) => {{ '{' }}
+            <span class="text-yellow-300">required</span>(f.email, {{ '{' }} message: <span class="text-green-400">'Required'</span> {{ '}' }});
+  <span class="text-yellow-300">email</span>(f.email, {{ '{' }} message: <span class="text-green-400">'Invalid'</span> {{ '}' }});
+  <span class="text-yellow-300">required</span>(f.password, {{ '{' }} message: <span class="text-green-400">'Required'</span> {{ '}' }});
+  <span class="text-yellow-300">minLength</span>(f.password, 8);
+  <span class="text-yellow-300">validate</span>(f.confirmPassword, ({{ '{' }} value, valueOf {{ '}' }}) =>
+    value() !== valueOf(f.password)
+      ? {{ '{' }} kind: <span class="text-green-400">'mismatch'</span>, message: <span class="text-green-400">'No match'</span> {{ '}' }}
+            : <span class="text-yellow-300">null</span>
+  );
+            {{ '}' }});
+
+<span class="text-gray-400">// Template: one directive for everything</span>
+&lt;input [formField]="signalForm.email"&gt;
+&lt;input [formField]="signalForm.password"&gt;
+
+<span class="text-gray-400">// Error checking: fully typed, signal-based</span>
+signalForm.email().errors()
+<span class="text-gray-400">// Returns: ValidationError[] (typed!)</span></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Comparison Table -->
+  <div class="mt-8 bg-white rounded-lg shadow-md overflow-hidden">
+    <table class="w-full text-left">
+      <thead class="bg-gray-100">
+        <tr>
+          <th class="px-6 py-4 font-semibold text-gray-700">Feature</th>
+          <th class="px-6 py-4 font-semibold text-blue-600">Reactive Forms</th>
+          <th class="px-6 py-4 font-semibold text-red-600">Signal Forms</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-100">
+        <tr>
+          <td class="px-6 py-3 font-medium">State Management</td>
+          <td class="px-6 py-3 text-gray-600">Form-owned state</td>
+          <td class="px-6 py-3 text-gray-600">
+            Model signal (single source of truth)
+          </td>
+        </tr>
+        <tr>
+          <td class="px-6 py-3 font-medium">Type Safety</td>
+          <td class="px-6 py-3 text-gray-600">
+            String-based access, T | null everywhere
+          </td>
+          <td class="px-6 py-3 text-gray-600">
+            Full path typing, no null by default
+          </td>
+        </tr>
+        <tr>
+          <td class="px-6 py-3 font-medium">Directives</td>
+          <td class="px-6 py-3 text-gray-600">
+            formGroup, formControlName, formArray...
+          </td>
+          <td class="px-6 py-3 text-gray-600">Single [field] directive</td>
+        </tr>
+        <tr>
+          <td class="px-6 py-3 font-medium">Cross-field Validation</td>
+          <td class="px-6 py-3 text-gray-600">
+            Separate validator fn + updateValueAndValidity
+          </td>
+          <td class="px-6 py-3 text-gray-600">Auto-tracking via valueOf()</td>
+        </tr>
+        <tr>
+          <td class="px-6 py-3 font-medium">Custom Controls</td>
+          <td class="px-6 py-3 text-gray-600">
+            ControlValueAccessor + provider boilerplate
+          </td>
+          <td class="px-6 py-3 text-gray-600">
+            Just implement FormValueControl (1 model signal)
+          </td>
+        </tr>
+        <tr>
+          <td class="px-6 py-3 font-medium">Reactivity</td>
+          <td class="px-6 py-3 text-gray-600">
+            Observables + subscribe/unsubscribe
+          </td>
+          <td class="px-6 py-3 text-gray-600">Built-in signals</td>
+        </tr>
+        <tr>
+          <td class="px-6 py-3 font-medium">Reusable Validation</td>
+          <td class="px-6 py-3 text-gray-600">
+            Validator functions per control
+          </td>
+          <td class="px-6 py-3 text-gray-600">schema() + apply()</td>
+        </tr>
+        <tr>
+          <td class="px-6 py-3 font-medium">Status</td>
+          <td class="px-6 py-3">
+            <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-sm"
+              >Stable</span
+            >
+          </td>
+          <td class="px-6 py-3">
+            <span
+              class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-sm"
+              >Experimental (v21+)</span
+            >
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -1,0 +1,51 @@
+<div class="app-container">
+  <nav class="navbar">
+    <div class="nav-content">
+      <a
+        routerLink="/"
+        class="logo"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{exact: true}"
+      >
+        <span class="logo-icon">🅰️</span>
+        <span class="logo-text">Signal Forms</span>
+      </a>
+
+      <div class="nav-links">
+        <a
+          routerLink="/"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{exact: true}"
+        >
+          Home
+        </a>
+
+        <span class="nav-separator">Basics</span>
+        <a routerLink="/basic" routerLinkActive="active"> Basic </a>
+        <a routerLink="/registration" routerLinkActive="active"> Validation </a>
+        <a routerLink="/address" routerLinkActive="active"> Schemas </a>
+        <a routerLink="/conditional" routerLinkActive="active"> Conditional </a>
+
+        <span class="nav-separator">Advanced</span>
+        <a routerLink="/custom-controls" routerLinkActive="active">
+          Custom Controls
+        </a>
+        <a routerLink="/form-arrays" routerLinkActive="active"> Form Arrays </a>
+        <a routerLink="/errors" routerLinkActive="active"> Error Handling </a>
+        <a routerLink="/dynamic" routerLinkActive="active"> Dynamic Schemas </a>
+
+        <span class="nav-separator">Migration</span>
+        <a routerLink="/comparison" routerLinkActive="active"> Comparison </a>
+        <a routerLink="/migration" routerLinkActive="active"> Migration </a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="main-content">
+    <router-outlet></router-outlet>
+  </main>
+
+  <footer class="footer">
+    <p>Angular 21 Signal Forms Demo | Built for TED Talk</p>
+  </footer>
+</div>

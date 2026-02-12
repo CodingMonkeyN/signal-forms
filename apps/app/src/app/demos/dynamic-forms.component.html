@@ -1,0 +1,466 @@
+<div class="max-w-6xl mx-auto px-6 py-8">
+  <h1 class="text-4xl font-bold text-gray-800 mb-2">
+    Dynamic Schema Switching
+  </h1>
+  <p class="text-lg text-gray-600 mb-8">
+    Use <code>applyWhen()</code> to conditionally activate entire schemas based
+    on field values. Fields hide/show and validation rules swap in real-time.
+  </p>
+
+  <div class="grid grid-cols-1 xl:grid-cols-5 gap-8">
+    <!-- Form -->
+    <div class="xl:col-span-3 bg-white rounded-lg shadow-md p-6">
+      <h2 class="text-2xl font-semibold mb-6">Document Generator</h2>
+
+      <div class="space-y-5">
+        <!-- Document Type Switcher -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2"
+            >Document Type</label
+          >
+          <div class="grid grid-cols-3 gap-2">
+            @for (type of documentTypes; track type.value) {
+              <button
+                type="button"
+                class="py-3 px-4 rounded-lg border-2 text-center transition font-semibold text-sm"
+                [class.border-red-500]="docModel().documentType === type.value"
+                [class.bg-red-50]="docModel().documentType === type.value"
+                [class.text-red-700]="docModel().documentType === type.value"
+                [class.border-gray-200]="docModel().documentType !== type.value"
+                [class.text-gray-600]="docModel().documentType !== type.value"
+                [class.hover:border-gray-300]="
+                  docModel().documentType !== type.value
+                "
+                (click)="switchDocumentType(type.value)"
+              >
+                <span class="block text-lg mb-1">{{ type.icon }}</span>
+                {{ type.label }}
+              </button>
+            }
+          </div>
+        </div>
+
+        <!-- Common Fields -->
+        <fieldset class="border border-gray-200 rounded-lg p-4">
+          <legend class="text-sm font-semibold text-gray-500 px-2 uppercase">
+            Common Fields
+          </legend>
+          <div class="space-y-3 mt-2">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1"
+                >Customer Name</label
+              >
+              <input
+                type="text"
+                [formField]="docForm.customerName"
+                class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none transition"
+                placeholder="Acme Corp"
+              />
+              @if (
+                docForm.customerName().touched() &&
+                docForm.customerName().invalid()
+              ) {
+                @for (
+                  error of docForm.customerName().errors();
+                  track error.kind
+                ) {
+                  <p class="text-red-600 text-sm mt-1">
+                    {{ error.message }}
+                  </p>
+                }
+              }
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1"
+                >Customer Email</label
+              >
+              <input
+                type="email"
+                [formField]="docForm.customerEmail"
+                class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none transition"
+                placeholder="contact&#64;acme.com"
+              />
+              @if (
+                docForm.customerEmail().touched() &&
+                docForm.customerEmail().invalid()
+              ) {
+                @for (
+                  error of docForm.customerEmail().errors();
+                  track error.kind
+                ) {
+                  <p class="text-red-600 text-sm mt-1">
+                    {{ error.message }}
+                  </p>
+                }
+              }
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- Invoice Fields -->
+        @if (!docForm.invoiceNumber().hidden()) {
+          <fieldset
+            class="border border-blue-200 bg-blue-50/30 rounded-lg p-4 transition-all"
+          >
+            <legend class="text-sm font-semibold text-blue-600 px-2 uppercase">
+              Invoice Details
+            </legend>
+            <div class="space-y-3 mt-2">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Invoice Number</label
+                >
+                <input
+                  type="text"
+                  [formField]="docForm.invoiceNumber"
+                  class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition"
+                  placeholder="INV-2025-001"
+                />
+                @if (
+                  docForm.invoiceNumber().touched() &&
+                  docForm.invoiceNumber().invalid()
+                ) {
+                  @for (
+                    error of docForm.invoiceNumber().errors();
+                    track error.kind
+                  ) {
+                    <p class="text-red-600 text-sm mt-1">
+                      {{ error.message }}
+                    </p>
+                  }
+                }
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1"
+                    >Due Date</label
+                  >
+                  <input
+                    type="date"
+                    [formField]="docForm.dueDate"
+                    class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition"
+                  />
+                  @if (
+                    docForm.dueDate().touched() && docForm.dueDate().invalid()
+                  ) {
+                    @for (
+                      error of docForm.dueDate().errors();
+                      track error.kind
+                    ) {
+                      <p class="text-red-600 text-sm mt-1">
+                        {{ error.message }}
+                      </p>
+                    }
+                  }
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1"
+                    >Tax Rate (%)</label
+                  >
+                  <input
+                    type="number"
+                    [formField]="docForm.taxRate"
+                    class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition"
+                    placeholder="19"
+                  />
+                </div>
+              </div>
+            </div>
+          </fieldset>
+        }
+
+        <!-- Quote Fields -->
+        @if (!docForm.validUntil().hidden()) {
+          <fieldset
+            class="border border-green-200 bg-green-50/30 rounded-lg p-4 transition-all"
+          >
+            <legend class="text-sm font-semibold text-green-600 px-2 uppercase">
+              Quote Details
+            </legend>
+            <div class="space-y-3 mt-2">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Valid Until</label
+                >
+                <input
+                  type="date"
+                  [formField]="docForm.validUntil"
+                  class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 outline-none transition"
+                />
+                @if (
+                  docForm.validUntil().touched() &&
+                  docForm.validUntil().invalid()
+                ) {
+                  @for (
+                    error of docForm.validUntil().errors();
+                    track error.kind
+                  ) {
+                    <p class="text-red-600 text-sm mt-1">
+                      {{ error.message }}
+                    </p>
+                  }
+                }
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Discount (%)</label
+                >
+                <input
+                  type="number"
+                  [formField]="docForm.discount"
+                  class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 outline-none transition"
+                  placeholder="0"
+                />
+                @if (
+                  docForm.discount().touched() && docForm.discount().invalid()
+                ) {
+                  @for (
+                    error of docForm.discount().errors();
+                    track error.kind
+                  ) {
+                    <p class="text-red-600 text-sm mt-1">
+                      {{ error.message }}
+                    </p>
+                  }
+                }
+              </div>
+            </div>
+          </fieldset>
+        }
+
+        <!-- Credit Note Fields -->
+        @if (!docForm.originalInvoice().hidden()) {
+          <fieldset
+            class="border border-orange-200 bg-orange-50/30 rounded-lg p-4 transition-all"
+          >
+            <legend
+              class="text-sm font-semibold text-orange-600 px-2 uppercase"
+            >
+              Credit Note Details
+            </legend>
+            <div class="space-y-3 mt-2">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Original Invoice</label
+                >
+                <input
+                  type="text"
+                  [formField]="docForm.originalInvoice"
+                  class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 outline-none transition"
+                  placeholder="INV-2025-001"
+                />
+                @if (
+                  docForm.originalInvoice().touched() &&
+                  docForm.originalInvoice().invalid()
+                ) {
+                  @for (
+                    error of docForm.originalInvoice().errors();
+                    track error.kind
+                  ) {
+                    <p class="text-red-600 text-sm mt-1">
+                      {{ error.message }}
+                    </p>
+                  }
+                }
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Reason</label
+                >
+                <textarea
+                  [formField]="docForm.reason"
+                  rows="3"
+                  class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 outline-none transition resize-none"
+                  placeholder="Reason for credit note..."
+                ></textarea>
+                @if (docForm.reason().touched() && docForm.reason().invalid()) {
+                  @for (error of docForm.reason().errors(); track error.kind) {
+                    <p class="text-red-600 text-sm mt-1">
+                      {{ error.message }}
+                    </p>
+                  }
+                }
+              </div>
+            </div>
+          </fieldset>
+        }
+
+        <!-- Delivery Method -->
+        <fieldset class="border border-gray-200 rounded-lg p-4">
+          <legend class="text-sm font-semibold text-gray-500 px-2 uppercase">
+            Delivery
+          </legend>
+          <div class="space-y-3 mt-2">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1"
+                >Delivery Method</label
+              >
+              <select
+                [formField]="docForm.deliveryMethod"
+                class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none transition"
+              >
+                <option value="email">Email</option>
+                <option value="post">Postal Mail</option>
+                <option value="pickup">Pickup</option>
+              </select>
+            </div>
+
+            @if (!docForm.postalAddress().hidden()) {
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Postal Address</label
+                >
+                <textarea
+                  [formField]="docForm.postalAddress"
+                  rows="2"
+                  class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none transition resize-none"
+                  placeholder="Street, ZIP, City"
+                ></textarea>
+                @if (
+                  docForm.postalAddress().touched() &&
+                  docForm.postalAddress().invalid()
+                ) {
+                  @for (
+                    error of docForm.postalAddress().errors();
+                    track error.kind
+                  ) {
+                    <p class="text-red-600 text-sm mt-1">
+                      {{ error.message }}
+                    </p>
+                  }
+                }
+              </div>
+            }
+
+            @if (!docForm.pickupLocation().hidden()) {
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Pickup Location</label
+                >
+                <select
+                  [formField]="docForm.pickupLocation"
+                  class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none transition"
+                >
+                  <option value="">Select a location...</option>
+                  <option value="hq">Headquarters - Berlin</option>
+                  <option value="branch-muc">Branch - Munich</option>
+                  <option value="branch-ham">Branch - Hamburg</option>
+                </select>
+                @if (
+                  docForm.pickupLocation().touched() &&
+                  docForm.pickupLocation().invalid()
+                ) {
+                  @for (
+                    error of docForm.pickupLocation().errors();
+                    track error.kind
+                  ) {
+                    <p class="text-red-600 text-sm mt-1">
+                      {{ error.message }}
+                    </p>
+                  }
+                }
+              </div>
+            }
+          </div>
+        </fieldset>
+
+        <button
+          class="w-full bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700 transition disabled:opacity-50"
+          [disabled]="docForm().invalid()"
+        >
+          Generate {{ activeDocLabel() }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Right Panel -->
+    <div class="xl:col-span-2 space-y-4">
+      <div class="bg-gray-900 text-green-400 rounded-lg p-6 font-mono text-sm">
+        <h3 class="text-white font-bold mb-4 font-sans text-lg">
+          Active Schema
+        </h3>
+
+        <div class="mb-3">
+          <span class="text-gray-400">// Which schema is active?</span><br />
+          <span class="text-yellow-300">documentType</span> = "{{
+            docModel().documentType
+          }}"<br />
+          <span class="text-yellow-300">invoiceSchema</span> =
+          {{ docModel().documentType === 'invoice' ? 'ACTIVE' : 'inactive'
+          }}<br />
+          <span class="text-yellow-300">quoteSchema</span> =
+          {{ docModel().documentType === 'quote' ? 'ACTIVE' : 'inactive'
+          }}<br />
+          <span class="text-yellow-300">creditNoteSchema</span> =
+          {{
+            docModel().documentType === 'credit-note' ? 'ACTIVE' : 'inactive'
+          }}
+        </div>
+
+        <div class="mb-3">
+          <span class="text-gray-400">// Hidden state</span><br />
+          <span class="text-yellow-300">invoiceNumber.hidden</span> =
+          {{ docForm.invoiceNumber().hidden() }}<br />
+          <span class="text-yellow-300">validUntil.hidden</span> =
+          {{ docForm.validUntil().hidden() }}<br />
+          <span class="text-yellow-300">originalInvoice.hidden</span> =
+          {{ docForm.originalInvoice().hidden() }}<br />
+          <span class="text-yellow-300">postalAddress.hidden</span> =
+          {{ docForm.postalAddress().hidden() }}<br />
+          <span class="text-yellow-300">pickupLocation.hidden</span> =
+          {{ docForm.pickupLocation().hidden() }}
+        </div>
+
+        <div>
+          <span class="text-gray-400">// Form validity</span><br />
+          <span class="text-yellow-300">form.valid</span> =
+          {{ docForm().valid() }}<br />
+          <span class="text-yellow-300">errors</span> =
+          {{ docForm().errorSummary().length }}
+        </div>
+      </div>
+
+      <div
+        class="bg-gray-900 text-gray-100 rounded-lg p-6 font-mono text-xs overflow-x-auto"
+      >
+        <h3 class="text-white font-bold mb-3 font-sans text-lg">applyWhen()</h3>
+        <pre
+          class="whitespace-pre-wrap"
+        ><span class="text-gray-400">// Conditionally activate entire schemas!</span>
+<span class="text-yellow-300">applyWhen</span>(
+  doc,                            <span class="text-gray-400">// target path</span>
+  ({{ '{' }} valueOf {{ '}' }}) =>                   <span class="text-gray-400">// condition</span>
+    valueOf(doc.documentType) === <span class="text-green-400">'invoice'</span>,
+  invoiceSchema                   <span class="text-gray-400">// schema to apply</span>
+);
+
+<span class="text-yellow-300">applyWhen</span>(doc,
+  ({{ '{' }} valueOf {{ '}' }}) =>
+    valueOf(doc.documentType) === <span class="text-green-400">'quote'</span>,
+  quoteSchema
+);
+
+<span class="text-gray-400">// Schema activates/deactivates reactively</span>
+<span class="text-gray-400">// Validation rules swap automatically</span>
+<span class="text-gray-400">// Hidden fields don't affect validity</span></pre>
+      </div>
+
+      <div class="bg-blue-50 border border-blue-200 rounded-lg p-6">
+        <h3 class="text-lg font-semibold text-blue-800 mb-3">Key Takeaways</h3>
+        <ul class="space-y-2 text-blue-900 text-sm">
+          <li>
+            <strong>applyWhen()</strong> - conditionally apply entire schemas
+          </li>
+          <li>Schemas activate/deactivate reactively based on conditions</li>
+          <li>
+            <strong>hidden()</strong> + <strong>applyWhen()</strong> work
+            together
+          </li>
+          <li>Hidden fields are excluded from parent validity</li>
+          <li>Switching document type instantly swaps validation rules</li>
+          <li>No manual cleanup or re-initialization needed</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

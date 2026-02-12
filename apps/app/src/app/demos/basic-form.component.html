@@ -1,0 +1,164 @@
+<div class="max-w-4xl mx-auto px-6 py-8">
+  <h1 class="text-4xl font-bold text-gray-800 mb-2">Basic Form</h1>
+  <p class="text-lg text-gray-600 mb-8">
+    The simplest Signal Form: a writable signal + <code>form()</code> +
+    <code>[formField]</code> directive.
+  </p>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <!-- Form -->
+    <div class="bg-white rounded-lg shadow-md p-6">
+      <h2 class="text-2xl font-semibold mb-6">Login Form</h2>
+
+      <div class="space-y-5">
+        <!-- Email -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1"
+            >Email</label
+          >
+          <input
+            type="email"
+            [formField]="loginForm.email"
+            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition"
+            placeholder="you&#64;example.com"
+          />
+          @if (loginForm.email().touched() && loginForm.email().invalid()) {
+            <div class="mt-1 space-y-1">
+              @for (error of loginForm.email().errors(); track error.kind) {
+                <p class="text-red-600 text-sm">{{ error.message }}</p>
+              }
+            </div>
+          }
+        </div>
+
+        <!-- Password -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1"
+            >Password</label
+          >
+          <input
+            type="password"
+            [formField]="loginForm.password"
+            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition"
+            placeholder="At least 8 characters"
+          />
+          @if (
+            loginForm.password().touched() && loginForm.password().invalid()
+          ) {
+            <div class="mt-1 space-y-1">
+              @for (error of loginForm.password().errors(); track error.kind) {
+                <p class="text-red-600 text-sm">{{ error.message }}</p>
+              }
+            </div>
+          }
+        </div>
+
+        <button
+          class="w-full bg-red-600 text-white py-2 rounded-lg font-semibold hover:bg-red-700 transition disabled:opacity-50"
+          [disabled]="loginForm().invalid()"
+        >
+          Login
+        </button>
+      </div>
+    </div>
+
+    <!-- Live State Panel -->
+    <div class="space-y-4">
+      <div class="bg-gray-900 text-green-400 rounded-lg p-6 font-mono text-sm">
+        <h3 class="text-white font-bold mb-4 font-sans text-lg">
+          Live Form State
+        </h3>
+
+        <div class="mb-3">
+          <span class="text-gray-400">// Model signal value</span><br />
+          <span class="text-yellow-300">model</span> = {{ loginModel() | json }}
+        </div>
+
+        <div class="mb-3">
+          <span class="text-gray-400">// Form-level state</span><br />
+          <span class="text-yellow-300">form.valid</span> =
+          {{ loginForm().valid() }}<br />
+          <span class="text-yellow-300">form.dirty</span> =
+          {{ loginForm().dirty() }}<br />
+          <span class="text-yellow-300">form.touched</span> =
+          {{ loginForm().touched() }}
+        </div>
+
+        <div class="mb-3">
+          <span class="text-gray-400">// Email field state</span><br />
+          <span class="text-yellow-300">email.value</span> = "{{
+            loginForm.email().value()
+          }}"<br />
+          <span class="text-yellow-300">email.valid</span> =
+          {{ loginForm.email().valid() }}<br />
+          <span class="text-yellow-300">email.touched</span> =
+          {{ loginForm.email().touched() }}<br />
+          <span class="text-yellow-300">email.errors</span> =
+          {{ loginForm.email().errors() | json }}
+        </div>
+
+        <div>
+          <span class="text-gray-400">// Password field state</span><br />
+          <span class="text-yellow-300">password.value</span> = "{{
+            loginForm.password().value()
+          }}"<br />
+          <span class="text-yellow-300">password.valid</span> =
+          {{ loginForm.password().valid() }}<br />
+          <span class="text-yellow-300">password.touched</span> =
+          {{ loginForm.password().touched() }}<br />
+          <span class="text-yellow-300">password.errors</span> =
+          {{ loginForm.password().errors() | json }}
+        </div>
+      </div>
+
+      <!-- Key Takeaways -->
+      <div class="bg-blue-50 border border-blue-200 rounded-lg p-6">
+        <h3 class="text-lg font-semibold text-blue-800 mb-3">Key Takeaways</h3>
+        <ul class="space-y-2 text-blue-900 text-sm">
+          <li>
+            <strong>signal()</strong> creates the model - the single source of
+            truth
+          </li>
+          <li>
+            <strong>form()</strong> wraps the model and adds form state +
+            validation
+          </li>
+          <li>
+            <strong>[formField]</strong> is the only directive needed for
+            binding
+          </li>
+          <li>
+            Validation is declared in the schema function (2nd arg of form())
+          </li>
+          <li>Model and form stay in sync automatically</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Code Example -->
+  <div
+    class="mt-8 bg-gray-900 text-gray-100 rounded-lg p-6 font-mono text-sm overflow-x-auto"
+  >
+    <h3 class="text-white font-bold mb-4 font-sans text-lg">Code</h3>
+    <pre
+      class="whitespace-pre-wrap"
+    ><span class="text-purple-400">import</span> {{ '{' }} signal {{ '}' }} <span class="text-purple-400">from</span> <span class="text-green-400">'&#64;angular/core'</span>;
+<span class="text-purple-400">import</span> {{ '{' }} form, FormField, required, email, minLength {{ '}' }} <span class="text-purple-400">from</span> <span class="text-green-400">'&#64;angular/forms/signals'</span>;
+
+<span class="text-gray-400">// 1. Create a model signal</span>
+loginModel = <span class="text-yellow-300">signal</span>({{ '{' }} email: <span class="text-green-400">''</span>, password: <span class="text-green-400">''</span> {{ '}' }});
+
+<span class="text-gray-400">// 2. Create a form with validation schema</span>
+loginForm = <span class="text-yellow-300">form</span>(this.loginModel, (login) => {{ '{' }}
+      <span class="text-yellow-300">required</span>(login.email, {{ '{' }} message: <span class="text-green-400">'Email is required'</span> {{ '}' }});
+  <span class="text-yellow-300">email</span>(login.email, {{ '{' }} message: <span class="text-green-400">'Invalid email'</span> {{ '}' }});
+  <span class="text-yellow-300">required</span>(login.password, {{ '{' }} message: <span class="text-green-400">'Password is required'</span> {{ '}' }});
+  <span class="text-yellow-300">minLength</span>(login.password, 8, {{ '{' }} message: <span class="text-green-400">'Min 8 chars'</span> {{ '}' }});
+      {{ '}' }});
+
+<span class="text-gray-400">// 3. Template - just use [field]</span>
+&lt;input [formField]="loginForm.email" /&gt;
+&lt;input [formField]="loginForm.password" /&gt;</pre>
+  </div>
+</div>

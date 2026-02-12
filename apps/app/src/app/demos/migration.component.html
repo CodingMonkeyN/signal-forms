@@ -1,0 +1,482 @@
+<div class="max-w-7xl mx-auto px-6 py-8">
+  <h1 class="text-4xl font-bold text-gray-800 mb-2">Migration Guide</h1>
+  <p class="text-lg text-gray-600 mb-8">
+    Reactive Forms and Signal Forms can coexist! Use <code>compatForm()</code> to
+    migrate incrementally &mdash; field by field, component by component.
+  </p>
+
+  <!-- Phase Switcher -->
+  <div class="flex gap-2 mb-8">
+    @for (phase of [1, 2, 3]; track phase) {
+      <button
+        type="button"
+        class="flex-1 py-4 px-6 rounded-lg border-2 text-center transition font-semibold"
+        [class.border-red-500]="activePhase === phase"
+        [class.bg-red-50]="activePhase === phase"
+        [class.text-red-700]="activePhase === phase"
+        [class.border-gray-200]="activePhase !== phase"
+        [class.text-gray-600]="activePhase !== phase"
+        [class.hover:border-gray-300]="activePhase !== phase"
+        (click)="setPhase($any(phase))"
+      >
+        @switch (phase) {
+          @case (1) {
+            <span class="block text-2xl mb-1">1️⃣</span>
+            <span class="block text-sm font-bold">Before</span>
+            <span class="block text-xs text-gray-500">Pure Reactive Forms</span>
+          }
+          @case (2) {
+            <span class="block text-2xl mb-1">2️⃣</span>
+            <span class="block text-sm font-bold">Hybrid</span>
+            <span class="block text-xs text-gray-500">compatForm() Migration</span>
+          }
+          @case (3) {
+            <span class="block text-2xl mb-1">3️⃣</span>
+            <span class="block text-sm font-bold">After</span>
+            <span class="block text-xs text-gray-500">Pure Signal Forms</span>
+          }
+        }
+      </button>
+    }
+  </div>
+
+  <div class="grid grid-cols-1 xl:grid-cols-5 gap-8">
+    <div class="xl:col-span-3">
+      <!-- ============================================ -->
+      <!-- PHASE 1: Pure Reactive Forms -->
+      <!-- ============================================ -->
+      @if (activePhase === 1) {
+        <div class="bg-white rounded-lg shadow-md p-6">
+          <div class="flex items-center gap-3 mb-6">
+            <span class="bg-blue-100 text-blue-800 text-xs font-bold px-3 py-1 rounded-full uppercase">Reactive Forms</span>
+            <h2 class="text-2xl font-semibold">User Registration</h2>
+          </div>
+
+          <form [formGroup]="reactiveForm" class="space-y-5">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+              <input
+                type="text"
+                formControlName="name"
+                class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition"
+                placeholder="John Doe"
+              />
+              @if (reactiveForm.get('name')?.touched && reactiveForm.get('name')?.invalid) {
+                <p class="text-red-600 text-sm mt-1">
+                  {{ reactiveForm.get('name')?.hasError('required') ? 'Name is required' :
+                     reactiveForm.get('name')?.hasError('minlength') ? 'Name must be at least 2 characters' : '' }}
+                </p>
+              }
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+              <input
+                type="email"
+                formControlName="email"
+                class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition"
+                placeholder="you&#64;example.com"
+              />
+              @if (reactiveForm.get('email')?.touched && reactiveForm.get('email')?.invalid) {
+                <p class="text-red-600 text-sm mt-1">
+                  {{ reactiveForm.get('email')?.hasError('required') ? 'Email is required' :
+                     reactiveForm.get('email')?.hasError('email') ? 'Invalid email address' : '' }}
+                </p>
+              }
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+              <input
+                type="password"
+                formControlName="password"
+                class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition"
+                placeholder="At least 8 characters"
+              />
+              @if (reactiveForm.get('password')?.touched && reactiveForm.get('password')?.invalid) {
+                <p class="text-red-600 text-sm mt-1">
+                  {{ reactiveForm.get('password')?.hasError('required') ? 'Password is required' :
+                     reactiveForm.get('password')?.hasError('minlength') ? 'Min 8 characters' : '' }}
+                </p>
+              }
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
+              <input
+                type="password"
+                formControlName="confirmPassword"
+                class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition"
+              />
+              @if (reactiveForm.get('confirmPassword')?.touched && reactiveForm.errors?.['passwordMismatch']) {
+                <p class="text-red-600 text-sm mt-1">Passwords do not match</p>
+              }
+            </div>
+
+            <button
+              class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition disabled:opacity-50"
+              [disabled]="reactiveForm.invalid"
+            >
+              Register (Reactive)
+            </button>
+          </form>
+        </div>
+      }
+
+      <!-- ============================================ -->
+      <!-- PHASE 2: Hybrid compatForm -->
+      <!-- ============================================ -->
+      @if (activePhase === 2) {
+        <div class="bg-white rounded-lg shadow-md p-6">
+          <div class="flex items-center gap-3 mb-6">
+            <span class="bg-orange-100 text-orange-800 text-xs font-bold px-3 py-1 rounded-full uppercase">Hybrid</span>
+            <h2 class="text-2xl font-semibold">User Registration</h2>
+          </div>
+
+          <div class="space-y-5">
+            <!-- Migrated fields: plain signal values + [formField] -->
+            <div class="relative">
+              <div class="absolute -left-3 top-0 bottom-0 w-1 bg-green-500 rounded-full"></div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">
+                Name
+                <span class="text-xs text-green-600 ml-1">migrated</span>
+              </label>
+              <input
+                type="text"
+                [formField]="hybridForm.name"
+                class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 outline-none transition"
+                placeholder="John Doe"
+              />
+              @if (hybridForm.name().touched() && hybridForm.name().invalid()) {
+                @for (error of hybridForm.name().errors(); track error.kind) {
+                  <p class="text-red-600 text-sm mt-1">{{ error.message }}</p>
+                }
+              }
+            </div>
+
+            <div class="relative">
+              <div class="absolute -left-3 top-0 bottom-0 w-1 bg-green-500 rounded-full"></div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">
+                Email
+                <span class="text-xs text-green-600 ml-1">migrated</span>
+              </label>
+              <input
+                type="email"
+                [formField]="hybridForm.email"
+                class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 outline-none transition"
+                placeholder="you&#64;example.com"
+              />
+              @if (hybridForm.email().touched() && hybridForm.email().invalid()) {
+                @for (error of hybridForm.email().errors(); track error.kind) {
+                  <p class="text-red-600 text-sm mt-1">{{ error.message }}</p>
+                }
+              }
+            </div>
+
+            <!-- Legacy fields: still FormControl, but bound via [formField] -->
+            <div class="relative">
+              <div class="absolute -left-3 top-0 bottom-0 w-1 bg-blue-500 rounded-full"></div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">
+                Password
+                <span class="text-xs text-blue-600 ml-1">legacy FormControl</span>
+              </label>
+              <input
+                type="password"
+                [formField]="hybridForm.password"
+                class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition"
+                placeholder="At least 8 characters"
+              />
+              @if (hybridForm.password().touched() && hybridForm.password().invalid()) {
+                @for (error of hybridForm.password().errors(); track error.kind) {
+                  <p class="text-red-600 text-sm mt-1">{{ error.message || error.kind }}</p>
+                }
+              }
+            </div>
+
+            <div class="relative">
+              <div class="absolute -left-3 top-0 bottom-0 w-1 bg-blue-500 rounded-full"></div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">
+                Confirm Password
+                <span class="text-xs text-blue-600 ml-1">legacy FormControl</span>
+              </label>
+              <input
+                type="password"
+                [formField]="hybridForm.confirmPassword"
+                class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition"
+              />
+              @if (hybridForm.confirmPassword().touched() && hybridForm.confirmPassword().invalid()) {
+                @for (error of hybridForm.confirmPassword().errors(); track error.kind) {
+                  <p class="text-red-600 text-sm mt-1">{{ error.message || error.kind }}</p>
+                }
+              }
+            </div>
+
+            <button
+              class="w-full bg-gradient-to-r from-green-600 to-blue-600 text-white py-3 rounded-lg font-semibold hover:from-green-700 hover:to-blue-700 transition disabled:opacity-50"
+              [disabled]="hybridForm().invalid()"
+            >
+              Register (Hybrid)
+            </button>
+          </div>
+
+          <!-- Legend -->
+          <div class="mt-6 flex gap-4 text-sm">
+            <div class="flex items-center gap-2">
+              <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+              <span class="text-gray-600">Migrated to Signal Forms</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <div class="w-3 h-3 bg-blue-500 rounded-full"></div>
+              <span class="text-gray-600">Still on Reactive FormControl</span>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- ============================================ -->
+      <!-- PHASE 3: Fully migrated Signal Forms -->
+      <!-- ============================================ -->
+      @if (activePhase === 3) {
+        <div class="bg-white rounded-lg shadow-md p-6">
+          <div class="flex items-center gap-3 mb-6">
+            <span class="bg-red-100 text-red-800 text-xs font-bold px-3 py-1 rounded-full uppercase">Signal Forms</span>
+            <h2 class="text-2xl font-semibold">User Registration</h2>
+          </div>
+
+          <div class="space-y-5">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+              <input
+                type="text"
+                [formField]="signalForm.name"
+                class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none transition"
+                placeholder="John Doe"
+              />
+              @if (signalForm.name().touched() && signalForm.name().invalid()) {
+                @for (error of signalForm.name().errors(); track error.kind) {
+                  <p class="text-red-600 text-sm mt-1">{{ error.message }}</p>
+                }
+              }
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+              <input
+                type="email"
+                [formField]="signalForm.email"
+                class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none transition"
+                placeholder="you&#64;example.com"
+              />
+              @if (signalForm.email().touched() && signalForm.email().invalid()) {
+                @for (error of signalForm.email().errors(); track error.kind) {
+                  <p class="text-red-600 text-sm mt-1">{{ error.message }}</p>
+                }
+              }
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+              <input
+                type="password"
+                [formField]="signalForm.password"
+                class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none transition"
+                placeholder="At least 8 characters"
+              />
+              @if (signalForm.password().touched() && signalForm.password().invalid()) {
+                @for (error of signalForm.password().errors(); track error.kind) {
+                  <p class="text-red-600 text-sm mt-1">{{ error.message }}</p>
+                }
+              }
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
+              <input
+                type="password"
+                [formField]="signalForm.confirmPassword"
+                class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none transition"
+              />
+              @if (signalForm.confirmPassword().touched() && signalForm.confirmPassword().invalid()) {
+                @for (error of signalForm.confirmPassword().errors(); track error.kind) {
+                  <p class="text-red-600 text-sm mt-1">{{ error.message }}</p>
+                }
+              }
+            </div>
+
+            <button
+              class="w-full bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700 transition disabled:opacity-50"
+              [disabled]="signalForm().invalid()"
+            >
+              Register (Signal)
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Right Panel -->
+    <div class="xl:col-span-2 space-y-4">
+      <!-- Phase-specific code -->
+      @if (activePhase === 1) {
+        <div class="bg-gray-900 text-gray-100 rounded-lg p-6 font-mono text-xs overflow-x-auto">
+          <h3 class="text-white font-bold mb-3 font-sans text-lg">Phase 1: Reactive Forms</h3>
+          <pre class="whitespace-pre-wrap"><span class="text-gray-400">// Traditional approach - FormGroup + FormControl</span>
+<span class="text-purple-400">import</span> {{ '{' }} FormGroup, FormControl, Validators {{ '}' }}
+  <span class="text-purple-400">from</span> <span class="text-green-400">'&#64;angular/forms'</span>;
+
+reactiveForm = <span class="text-purple-400">new</span> <span class="text-yellow-300">FormGroup</span>({{ '{' }}
+  name: <span class="text-purple-400">new</span> FormControl(<span class="text-green-400">''</span>, [
+    Validators.required,
+    Validators.minLength(2),
+  ]),
+  email: <span class="text-purple-400">new</span> FormControl(<span class="text-green-400">''</span>, [
+    Validators.required,
+    Validators.email,
+  ]),
+  password: <span class="text-purple-400">new</span> FormControl(<span class="text-green-400">''</span>, [
+    Validators.required,
+    Validators.minLength(8),
+  ]),
+{{ '}' }}, {{ '{' }}
+  validators: passwordMatchValidator
+{{ '}' }});
+
+<span class="text-gray-400">// Template uses formControlName</span>
+&lt;form [formGroup]="reactiveForm"&gt;
+  &lt;input formControlName="name" /&gt;
+  &lt;input formControlName="email" /&gt;
+&lt;/form&gt;</pre>
+        </div>
+
+        <div class="bg-red-50 border border-red-200 rounded-lg p-6">
+          <h3 class="text-lg font-semibold text-red-800 mb-3">Pain Points</h3>
+          <ul class="space-y-2 text-red-900 text-sm">
+            <li>String-based access: <code>get('name')?.hasError('required')</code></li>
+            <li>No type safety on error keys</li>
+            <li>Cross-field validators are separate functions</li>
+            <li>Form owns state, not the data model</li>
+            <li>Manual <code>updateValueAndValidity()</code> calls needed</li>
+          </ul>
+        </div>
+      }
+
+      @if (activePhase === 2) {
+        <div class="bg-gray-900 text-gray-100 rounded-lg p-6 font-mono text-xs overflow-x-auto">
+          <h3 class="text-white font-bold mb-3 font-sans text-lg">Phase 2: compatForm()</h3>
+          <pre class="whitespace-pre-wrap"><span class="text-gray-400">// Import from signals-compat entry point</span>
+<span class="text-purple-400">import</span> {{ '{' }} <span class="text-yellow-300">compatForm</span> {{ '}' }}
+  <span class="text-purple-400">from</span> <span class="text-green-400">'&#64;angular/forms/signals-compat'</span>;
+
+<span class="text-gray-400">// Keep legacy FormControls for fields not yet migrated</span>
+legacyPassword = <span class="text-purple-400">new</span> FormControl(<span class="text-green-400">''</span>, [
+  Validators.required,
+  Validators.minLength(8),
+]);
+
+<span class="text-gray-400">// Mix plain values + FormControls in one model!</span>
+hybridModel = <span class="text-yellow-300">signal</span>({{ '{' }}
+  name: <span class="text-green-400">''</span>,              <span class="text-gray-400">// migrated</span>
+  email: <span class="text-green-400">''</span>,             <span class="text-gray-400">// migrated</span>
+  password: legacyPassword, <span class="text-gray-400">// legacy</span>
+  confirmPw: legacyCpw,     <span class="text-gray-400">// legacy</span>
+{{ '}' }});
+
+hybridForm = <span class="text-yellow-300">compatForm</span>(model, (f) => {{ '{' }}
+  <span class="text-gray-400">// Signal validation for migrated fields</span>
+  <span class="text-yellow-300">required</span>(f.name);
+  <span class="text-yellow-300">email</span>(f.email);
+  <span class="text-gray-400">// password keeps its Reactive validators!</span>
+{{ '}' }});
+
+<span class="text-gray-400">// Template: ALL fields use [formField]!</span>
+&lt;input [formField]="hybridForm.name" /&gt;
+&lt;input [formField]="hybridForm.password" /&gt;</pre>
+        </div>
+
+        <div class="bg-orange-50 border border-orange-200 rounded-lg p-6">
+          <h3 class="text-lg font-semibold text-orange-800 mb-3">Migration Strategy</h3>
+          <ul class="space-y-2 text-orange-900 text-sm">
+            <li><strong>compatForm()</strong> accepts both plain values and FormControls</li>
+            <li>Migrated fields use Signal Forms validation (<code>required()</code>, etc.)</li>
+            <li>Legacy FormControls keep their existing <code>Validators</code></li>
+            <li><strong>[formField]</strong> works for both &mdash; one directive for all</li>
+            <li>Migrate one field at a time, no big-bang needed</li>
+            <li>Template accesses are uniform: <code>form.name().errors()</code></li>
+          </ul>
+        </div>
+
+        <div class="bg-green-50 border border-green-200 rounded-lg p-6">
+          <h3 class="text-lg font-semibold text-green-800 mb-3">What changed?</h3>
+          <ul class="space-y-2 text-green-900 text-sm">
+            <li><code>FormGroup</code> &rarr; <code>signal({{ '{' }}...{{ '}' }})</code> + <code>compatForm()</code></li>
+            <li><code>[formGroup]</code> / <code>formControlName</code> &rarr; <code>[formField]</code></li>
+            <li><code>get('name')?.hasError('required')</code> &rarr; <code>form.name().errors()</code></li>
+            <li>FormControls stay in the model until you're ready to migrate them</li>
+          </ul>
+        </div>
+      }
+
+      @if (activePhase === 3) {
+        <div class="bg-gray-900 text-gray-100 rounded-lg p-6 font-mono text-xs overflow-x-auto">
+          <h3 class="text-white font-bold mb-3 font-sans text-lg">Phase 3: Pure Signal Forms</h3>
+          <pre class="whitespace-pre-wrap"><span class="text-gray-400">// All legacy FormControls removed!</span>
+<span class="text-purple-400">import</span> {{ '{' }} form, required, email, minLength, validate {{ '}' }}
+  <span class="text-purple-400">from</span> <span class="text-green-400">'&#64;angular/forms/signals'</span>;
+
+<span class="text-gray-400">// Pure signal model - no FormControls</span>
+model = <span class="text-yellow-300">signal</span>({{ '{' }}
+  name: <span class="text-green-400">''</span>,
+  email: <span class="text-green-400">''</span>,
+  password: <span class="text-green-400">''</span>,
+  confirmPassword: <span class="text-green-400">''</span>,
+{{ '}' }});
+
+<span class="text-gray-400">// form() instead of compatForm()</span>
+signalForm = <span class="text-yellow-300">form</span>(model, (f) => {{ '{' }}
+  <span class="text-yellow-300">required</span>(f.name);
+  <span class="text-yellow-300">email</span>(f.email);
+  <span class="text-yellow-300">required</span>(f.password);
+  <span class="text-yellow-300">minLength</span>(f.password, 8);
+  <span class="text-gray-400">// Cross-field is now reactive!</span>
+  <span class="text-yellow-300">validate</span>(f.confirmPassword, ({{ '{' }} value, valueOf {{ '}' }}) =>
+    value() !== valueOf(f.password)
+      ? {{ '{' }} kind: <span class="text-green-400">'mismatch'</span>, message: <span class="text-green-400">'...'</span> {{ '}' }}
+      : <span class="text-yellow-300">null</span>
+  );
+{{ '}' }});</pre>
+        </div>
+
+        <div class="bg-green-50 border border-green-200 rounded-lg p-6">
+          <h3 class="text-lg font-semibold text-green-800 mb-3">Benefits Achieved</h3>
+          <ul class="space-y-2 text-green-900 text-sm">
+            <li>Full type safety &mdash; no string-based access</li>
+            <li>Cross-field validation via <code>valueOf()</code> &mdash; auto-tracks!</li>
+            <li>Single <code>[formField]</code> directive for everything</li>
+            <li>Model signal is the single source of truth</li>
+            <li>No <code>ReactiveFormsModule</code> import needed</li>
+            <li>Typed errors with <code>.kind</code> and <code>.message</code></li>
+          </ul>
+        </div>
+      }
+
+      <!-- Migration Steps Overview -->
+      <div class="bg-blue-50 border border-blue-200 rounded-lg p-6">
+        <h3 class="text-lg font-semibold text-blue-800 mb-3">3-Step Migration Plan</h3>
+        <ol class="space-y-3 text-blue-900 text-sm">
+          <li class="flex items-start gap-2" [class.opacity-50]="activePhase > 1">
+            <span class="bg-blue-200 text-blue-800 rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold shrink-0">1</span>
+            <span><strong>Start with compatForm()</strong> &mdash; wrap your existing model in a signal, embed FormControls directly</span>
+          </li>
+          <li class="flex items-start gap-2" [class.opacity-50]="activePhase > 2">
+            <span class="bg-blue-200 text-blue-800 rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold shrink-0">2</span>
+            <span><strong>Migrate fields one by one</strong> &mdash; replace FormControl with plain value, add signal validation</span>
+          </li>
+          <li class="flex items-start gap-2" [class.opacity-50]="activePhase > 2">
+            <span class="bg-blue-200 text-blue-800 rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold shrink-0">3</span>
+            <span><strong>Switch to form()</strong> &mdash; once all FormControls are gone, replace compatForm with form</span>
+          </li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,284 @@
+<div class="max-w-5xl mx-auto px-6 py-8">
+  <h1 class="text-4xl font-bold text-gray-800 mb-2">Reusable Schemas</h1>
+  <p class="text-lg text-gray-600 mb-8">
+    Define validation rules once with <code>schema()</code>, apply everywhere
+    with <code>apply()</code>.
+  </p>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <!-- Form -->
+    <div class="bg-white rounded-lg shadow-md p-6">
+      <h2 class="text-2xl font-semibold mb-6">Order Form</h2>
+
+      <div class="space-y-5">
+        <!-- Customer Name -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1"
+            >Customer Name</label
+          >
+          <input
+            type="text"
+            [formField]="orderForm.customerName"
+            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition"
+          />
+          @if (
+            orderForm.customerName().touched() &&
+            orderForm.customerName().invalid()
+          ) {
+            @for (
+              error of orderForm.customerName().errors();
+              track error.kind
+            ) {
+              <p class="text-red-600 text-sm mt-1">{{ error.message }}</p>
+            }
+          }
+        </div>
+
+        <!-- Billing Address -->
+        <fieldset class="border border-gray-200 rounded-lg p-4">
+          <legend class="text-lg font-semibold text-red-600 px-2">
+            Billing Address
+          </legend>
+          <div class="space-y-3 mt-2">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1"
+                >Street</label
+              >
+              <input
+                [formField]="orderForm.billingAddress.street"
+                class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none transition"
+              />
+              @if (
+                orderForm.billingAddress.street().touched() &&
+                orderForm.billingAddress.street().invalid()
+              ) {
+                @for (
+                  error of orderForm.billingAddress.street().errors();
+                  track error.kind
+                ) {
+                  <p class="text-red-600 text-sm mt-1">{{ error.message }}</p>
+                }
+              }
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >City</label
+                >
+                <input
+                  [formField]="orderForm.billingAddress.city"
+                  class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none transition"
+                />
+                @if (
+                  orderForm.billingAddress.city().touched() &&
+                  orderForm.billingAddress.city().invalid()
+                ) {
+                  @for (
+                    error of orderForm.billingAddress.city().errors();
+                    track error.kind
+                  ) {
+                    <p class="text-red-600 text-sm mt-1">{{ error.message }}</p>
+                  }
+                }
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >ZIP Code</label
+                >
+                <input
+                  [formField]="orderForm.billingAddress.zipCode"
+                  class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none transition"
+                  placeholder="12345"
+                />
+                @if (
+                  orderForm.billingAddress.zipCode().touched() &&
+                  orderForm.billingAddress.zipCode().invalid()
+                ) {
+                  @for (
+                    error of orderForm.billingAddress.zipCode().errors();
+                    track error.kind
+                  ) {
+                    <p class="text-red-600 text-sm mt-1">{{ error.message }}</p>
+                  }
+                }
+              </div>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1"
+                >Country</label
+              >
+              <input
+                [formField]="orderForm.billingAddress.country"
+                class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none transition"
+              />
+              @if (
+                orderForm.billingAddress.country().touched() &&
+                orderForm.billingAddress.country().invalid()
+              ) {
+                @for (
+                  error of orderForm.billingAddress.country().errors();
+                  track error.kind
+                ) {
+                  <p class="text-red-600 text-sm mt-1">{{ error.message }}</p>
+                }
+              }
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- Same as billing checkbox -->
+        <label class="flex items-center gap-2 cursor-pointer">
+          <input
+            type="checkbox"
+            [formField]="orderForm.sameAsBilling"
+            class="w-4 h-4 text-red-600 rounded focus:ring-red-500"
+          />
+          <span class="text-sm text-gray-700"
+            >Shipping address same as billing</span
+          >
+        </label>
+
+        <!-- Shipping Address -->
+        @if (!orderModel().sameAsBilling) {
+          <fieldset class="border border-gray-200 rounded-lg p-4">
+            <legend class="text-lg font-semibold text-purple-600 px-2">
+              Shipping Address
+            </legend>
+            <div class="space-y-3 mt-2">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Street</label
+                >
+                <input
+                  [formField]="orderForm.shippingAddress.street"
+                  class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 outline-none transition"
+                />
+                @if (
+                  orderForm.shippingAddress.street().touched() &&
+                  orderForm.shippingAddress.street().invalid()
+                ) {
+                  @for (
+                    error of orderForm.shippingAddress.street().errors();
+                    track error.kind
+                  ) {
+                    <p class="text-red-600 text-sm mt-1">{{ error.message }}</p>
+                  }
+                }
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1"
+                    >City</label
+                  >
+                  <input
+                    [formField]="orderForm.shippingAddress.city"
+                    class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 outline-none transition"
+                  />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1"
+                    >ZIP Code</label
+                  >
+                  <input
+                    [formField]="orderForm.shippingAddress.zipCode"
+                    class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 outline-none transition"
+                    placeholder="12345"
+                  />
+                </div>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Country</label
+                >
+                <input
+                  [formField]="orderForm.shippingAddress.country"
+                  class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 outline-none transition"
+                />
+              </div>
+            </div>
+          </fieldset>
+        }
+
+        <button
+          class="w-full bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700 transition disabled:opacity-50"
+          [disabled]="orderForm().invalid()"
+        >
+          Place Order
+        </button>
+      </div>
+    </div>
+
+    <!-- Right Panel -->
+    <div class="space-y-4">
+      <div class="bg-gray-900 text-green-400 rounded-lg p-6 font-mono text-sm">
+        <h3 class="text-white font-bold mb-4 font-sans text-lg">
+          Live Form State
+        </h3>
+
+        <div class="mb-3">
+          <span class="text-gray-400">// Form validity</span><br />
+          <span class="text-yellow-300">form.valid</span> =
+          {{ orderForm().valid() }}<br />
+          <span class="text-yellow-300">sameAsBilling</span> =
+          {{ orderModel().sameAsBilling }}
+        </div>
+
+        <div class="mb-3">
+          <span class="text-gray-400">// Billing address</span><br />
+          <span class="text-yellow-300">billing.valid</span> =
+          {{ orderForm.billingAddress().valid() }}<br />
+          <span class="text-yellow-300">billing</span> =
+          {{ orderModel().billingAddress | json }}
+        </div>
+
+        <div>
+          <span class="text-gray-400">// Shipping address</span><br />
+          <span class="text-yellow-300">shipping.valid</span> =
+          {{ orderForm.shippingAddress().valid() }}<br />
+          <span class="text-yellow-300">shipping</span> =
+          {{ orderModel().shippingAddress | json }}
+        </div>
+      </div>
+
+      <div class="bg-blue-50 border border-blue-200 rounded-lg p-6">
+        <h3 class="text-lg font-semibold text-blue-800 mb-3">Key Takeaways</h3>
+        <ul class="space-y-2 text-blue-900 text-sm">
+          <li><strong>schema()</strong> defines reusable validation rules</li>
+          <li><strong>apply()</strong> applies a schema to a specific path</li>
+          <li>
+            Same <code>addressSchema</code> is used for both billing and
+            shipping
+          </li>
+          <li>Each instance gets its own independent validation state</li>
+          <li>
+            Deep nesting works: <code>orderForm.billingAddress.street</code>
+          </li>
+        </ul>
+      </div>
+
+      <div
+        class="bg-gray-900 text-gray-100 rounded-lg p-6 font-mono text-sm overflow-x-auto"
+      >
+        <h3 class="text-white font-bold mb-3 font-sans text-lg">
+          Schema Definition
+        </h3>
+        <pre
+          class="whitespace-pre-wrap"
+        ><span class="text-gray-400">// Define once...</span>
+<span class="text-purple-400">const</span> addressSchema = <span class="text-yellow-300">schema</span>&lt;Address&gt;((addr) => {{ '{' }}
+          <span class="text-yellow-300">required</span>(addr.street);
+  <span class="text-yellow-300">required</span>(addr.city);
+  <span class="text-yellow-300">required</span>(addr.zipCode);
+  <span class="text-yellow-300">pattern</span>(addr.zipCode, /^\d{{ '{' }}5{{ '}' }}$/);
+  <span class="text-yellow-300">required</span>(addr.country);
+          {{ '}' }});
+
+<span class="text-gray-400">// ...apply everywhere!</span>
+orderForm = <span class="text-yellow-300">form</span>(model, (order) => {{ '{' }}
+          <span class="text-yellow-300">apply</span>(order.billingAddress, addressSchema);
+  <span class="text-yellow-300">apply</span>(order.shippingAddress, addressSchema);
+          {{ '}' }});</pre>
+      </div>
+    </div>
+  </div>
+</div>
